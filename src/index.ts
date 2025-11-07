@@ -1,5 +1,5 @@
-// ceu-sdk.ts — SDK CEU estático
 import axios from "axios"
+import "dotenv/config";
 import {
     ApplyDiscountInput,
     ApplyDiscountResponse,
@@ -9,30 +9,29 @@ import {
 } from "./types";
 
 export class CeuClient {
-  private http
-
-  constructor(private config: CeuConfig) {
-    this.http = axios.create({
-      baseURL: config.baseUrl || "https://ceu.ao/api",
-      headers: {
-        "Content-Type": "application/json",
-        "API-TOKEN": config.apiToken,
-      },
+    private static http = axios.create({
+        baseURL: process.env.CEU_API_BASE_URL || "https://ceu.ao/api",
+        headers: {
+            "Content-Type": "application/json",
+            "API-TOKEN": process.env.CEU_API_KEY || "",
+        },
     })
-  }
 
-  async validateStudent(id: string | number) {
-    const { data } = await this.http.get<ValidateStudentResponse>(`/validate-student/${id}`)
-    return data
-  }
+    static async validateStudent(id: string | number):Promise<ValidateStudentResponse> {
+        console.log(this.http.defaults.headers)
+        const { data } = await this.http.get<ValidateStudentResponse>(`/validate-student/${id}`)
+        return data
+    }
 
-  async applyDiscount(id: string | number, body: ApplyDiscountInput) {
-    const { data } = await this.http.post<ApplyDiscountResponse>(`/apply-discount/${id}`, body)
-    return data
-  }
+    static async applyDiscount(id: string | number, body: ApplyDiscountInput) {
+        const { data } = await this.http.post<ApplyDiscountResponse>(`/apply-discount/${id}`, body)
+        return data
+    }
 
-  async getDiscountHistory(id: string | number) {
-    const { data } = await this.http.get<DiscountHistoryResponse>(`/history/${id}`)
-    return data
-  }
+    static async getDiscountHistory(id: string | number) {
+        const { data } = await this.http.get<DiscountHistoryResponse>(`/history/${id}`)
+        return data
+    }
 }
+
+
